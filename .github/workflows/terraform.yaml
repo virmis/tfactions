@@ -31,7 +31,9 @@ jobs:
       - name: Debug gihub push
         if: github.event_name == 'push'
         run: |
-          echo ${{ github.event.push }}
+          echo ${{ github.event.push.before }}
+          echo ${{ github.event.push.after }}
+          echo ${{ github.event.push.commits }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -39,9 +41,16 @@ jobs:
           terraform_version: 0.12.29
 
       - name: Get paths of changed functions
+        if: github.event_name == 'pull_request'
         id: getfile
         run: |
           echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | cut -d '/' -f1,2 | uniq | xargs)"
+
+      - name: Get paths of changed functions
+        if: github.event_name == 'push'
+        id: getfile
+        run: |
+          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.event.push.before }} | cut -d '/' -f1,2 | uniq | xargs)"
 
       - name: Print output
         run: echo ${{ steps.getfile.outputs.files }}
