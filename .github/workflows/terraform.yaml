@@ -45,21 +45,21 @@ jobs:
       run: |
         for i in ${{ steps.getpath.outputs.paths }}
         do
-          terraform init
+          terraform init $i
         done
 
     - name: Terraform validate
       run: |
         for i in ${{ steps.getpath.outputs.paths }}
         do
-          terraform validate
+          terraform validate $i
         done
 
     - name: Terraform format
       run: |
         for i in ${{ steps.getpath.outputs.paths }}
         do
-          terraform fmt -check
+          terraform fmt -check $i
         done
 
     - name: Terraform plan
@@ -69,7 +69,7 @@ jobs:
       run: |
         for i in ${{ steps.getpath.outputs.paths }}
         do
-          terraform plan
+          terraform plan $i
         done
 
     - name: Terraform Apply
@@ -80,6 +80,6 @@ jobs:
       run: |
         for i in ${{ steps.getpath.outputs.paths }}
         do
-          terraform apply -auto-approve
+          terraform apply -auto-approve $i
         done
 
