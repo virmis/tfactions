@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    name: 'terraform-plan'
+    name: 'terraform-apply'
     runs-on: ubuntu-latest
 
     steps:
