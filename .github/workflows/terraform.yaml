@@ -4,7 +4,13 @@ on:
   push:
     branches:
       - $default-branch
+    paths:
+      - 'stage/**'
+      - 'prod/**'
   pull_request:
+    paths:
+      - 'stage/**'
+      - 'prod/**'
 
 jobs:
   terraform:
@@ -24,31 +30,53 @@ jobs:
       with:
         terraform_version: 0.12.29
 
-    - name: Verify terraform version
-      run: terraform version
+    - name: get paths of changed functions
+      id: getpath
+      run: |
+        echo "::set-output name=paths::git diff-tree --no-commit-id --name-only -r c5b6b95 | cut -d '/' -f1,2 | uniq | xargs"
 
     - name: Terraform Init
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: terraform init
+      run: |
+        for i in ${{ steps.getpath.outputs.paths }}
+        do
+          terraform init
+        done
 
     - name: Terraform validate
-      run: terraform validate
+      run: |
+        for i in ${{ steps.getpath.outputs.paths }}
+        do
+          terraform validate
+        done
 
     - name: Terraform format
-      run: terraform fmt -check
+      run: |
+        for i in ${{ steps.getpath.outputs.paths }}
+        do
+          terraform fmt -check
+        done
 
     - name: Terraform plan
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: terraform plan
+      run: |
+        for i in ${{ steps.getpath.outputs.paths }}
+        do
+          terraform plan
+        done
 
     - name: Terraform Apply
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       if: github.ref == 'refs/heads/$default-branch' && github.event_name == 'push'
-      run: terraform apply -auto-approve
+      run: |
+        for i in ${{ steps.getpath.outputs.paths }}
+        do
+          terraform apply -auto-approve
+        done
 
