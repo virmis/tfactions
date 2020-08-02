@@ -1,0 +1,86 @@
+name: 'terraform-apply'
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'stage/**'
+      - 'prod/**'
+
+jobs:
+  terraform:
+    name: 'terraform-plan'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Debug gihub push
+        run: |
+          echo ${{ github.event.push.before }}
+          echo ${{ github.event.push.after }}
+          echo ${{ github.event.push.commits }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.12.29
+
+      - name: Get paths of changed functions
+        if: github.event_name == 'push'
+        id: getfile
+        run: |
+          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.event.push.before }} | cut -d '/' -f1,2 | uniq | xargs)"
+
+      - name: Print output
+        run: echo ${{ steps.getfile.outputs.files }}
+
+      - name: Print paths
+        run: |
+          for i in ${{ steps.getfile.outputs.files }}
+          do
+            echo $i
+          done
+
+      - name: Terraform Init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          for i in ${{ steps.getfile.outputs.files }}
+          do
+            terraform init $i
+          done
+
+      - name: Terraform validate
+        run: |
+          for i in ${{ steps.getfile.outputs.files }}
+          do
+            terraform validate $i
+          done
+
+      - name: Terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          for i in ${{ steps.getfile.outputs.files }}
+          do
+            terraform plan $i
+          done
+
+      - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: |
+          for i in ${{ steps.getfile.outputs.files }}
+          do
+            terraform apply -auto-approve $i
+          done
+
