@@ -30,14 +30,15 @@ jobs:
       with:
         terraform_version: 0.12.29
 
-    - name: get paths of changed functions
+    - name: Get paths of changed functions
       id: getfile
       run: |
         echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | cut -d '/' -f1,2 | uniq | xargs)"
 
-    - name: print paths
+    - name: Print paths
       run: |
         for i in ${{ steps.getfile.outputs.files }}
+        do
           echo $i
         done
 
