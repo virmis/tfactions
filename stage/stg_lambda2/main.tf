@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "ca-central-1"
+}
+
 module "role" {
   source = "../../modules/create_policy"
 
