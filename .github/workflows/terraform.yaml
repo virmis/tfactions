@@ -1,0 +1,46 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+      - $default-branch
+  pull_requests:
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.12.29
+
+    - name: Verify terraform version
+      run: terraform version
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform va;idate
+      run: terraform validate
+
+    - name:Terraform format
+      run: terraform fmt -check
+
+
+    - name: Terraform plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/$default-branch' && github.event_name == 'push'
+      run: terraform apply -auto-approve
+
