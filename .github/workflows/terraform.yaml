@@ -60,13 +60,6 @@ jobs:
             terraform validate $i
           done
 
-      - name: Terraform format
-        run: |
-          for i in ${{ steps.getfile.outputs.files }}
-          do
-            terraform fmt -check $i
-          done
-
       - name: Terraform plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
