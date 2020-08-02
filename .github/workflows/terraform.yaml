@@ -33,7 +33,7 @@ jobs:
     - name: get paths of changed functions
       id: getpath
       run: |
-        echo "::set-output name=paths::git diff-tree --no-commit-id --name-only -r c5b6b95 | cut -d '/' -f1,2 | uniq | xargs"
+        echo "::set-output name=paths::git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | cut -d '/' -f1,2 | uniq | xargs"
 
     - name: Terraform Init
       env:
