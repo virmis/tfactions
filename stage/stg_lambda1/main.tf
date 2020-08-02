@@ -1,5 +1,3 @@
-# test1
-
 module "role" {
   source = "../../modules/create_policy"
 
@@ -11,7 +9,7 @@ module "lambda" {
 
   aws_region                  = "eu-central-1"
   function_name               = "stg_lambda1"
-  description                 = "Test staging lambda 1"
+  description                 = "Test staging lambda function number 1"
   function_source             = "src/lambda_function_payload.zip"
   role_arn                    = module.role.lambda_role_arn
   timeout                     = 3
