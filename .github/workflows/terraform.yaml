@@ -23,8 +23,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug gihub variable
-        run: echo ${{ github }}
+      - name: Debug gihub pull_request
+        if: github.event_name == 'pull_request'
+        run: |
+          echo ${{ github.event.pull_request }}
+
+      - name: Debug gihub push
+        if: github.event_name == 'push'
+        run: |
+          echo ${{ github.event.push }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -77,7 +84,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        if: github.ref == 'refs/heads/$default-branch' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           for i in ${{ steps.getfile.outputs.files }}
           do
