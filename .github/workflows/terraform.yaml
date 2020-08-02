@@ -35,6 +35,9 @@ jobs:
       run: |
         echo "::set-output name=paths::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | cut -d '/' -f1,2 | uniq | xargs)"
 
+    - name: print paths
+      run: echo ${{ steps.getpath.outputs.paths }}
+
     - name: Terraform Init
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
