@@ -13,7 +13,7 @@ module "lambda" {
 
   aws_region                  = "eu-central-1"
   function_name               = "stg_lambda2"
-  description                 = "push test"
+  description                 = "push test number 2"
   function_source             = "${path.module}/src/lambda_function_payload.zip"
   role_arn                    = module.role.lambda_role_arn
   timeout                     = 3
