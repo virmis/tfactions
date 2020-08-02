@@ -33,7 +33,7 @@ jobs:
     - name: get paths of changed functions
       id: getfile
       run: |
-        echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | cut -d '/' -f1,2 | uniq | xargs)"
+        echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.head.sha }} | cut -d '/' -f1,2 | uniq | xargs)"
 
     - name: print paths
       run: |
