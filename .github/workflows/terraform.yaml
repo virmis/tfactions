@@ -22,7 +22,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Debug gihub variable
+        run: echo ${{ github }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
