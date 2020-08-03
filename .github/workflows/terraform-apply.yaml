@@ -20,24 +20,20 @@ jobs:
           fetch-depth: 0
 
       - name: list files
+        id: getfile
         run: |
           URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls"
           PRNUM=$(curl -s -X GET -H "Accept: application/vnd.github.groot-preview+json" -G $URL | jq -r '.[] | .number')
           echo $PRNUM
           URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${PRNUM}/files"
           FILES=$(curl -s -X GET -H "Accept: application/vnd.github.groot-preview+json" -G $URL | jq -r '.[] | .filename')
+          echo "::set-output name=files::$(curl -s -X GET -H "Accept: application/vnd.github.groot-preview+json" -G $URL | jq -r '.[] | .filename' | cut -d '/' -f1,2 | uniq | xargs)"
           echo $FILES
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 0.12.29
-
-      - name: Get paths of changed functions
-        if: github.event_name == 'push'
-        id: getfile
-        run: |
-          echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.event.pull_request.number }} | cut -d '/' -f1,2 | uniq | xargs)"
 
       - name: Print output
         run: echo ${{ steps.getfile.outputs.files }}
