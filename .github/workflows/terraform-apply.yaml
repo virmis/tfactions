@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      - '!_global/**'
       - 'stage/**'
       - 'prod/**'
 
