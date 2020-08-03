@@ -19,11 +19,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug gihub push
+      - name: list files
         run: |
-          echo ${{ github.event.push.before }}
-          echo ${{ github.event.push.after }}
-          echo ${{ github.event.push.commits }}
+          URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
+          FILES=$(curl -s -X GET -G $URL | jq -r '.[] | .filename')
+          echo $FILES
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
